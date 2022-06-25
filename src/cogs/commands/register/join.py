@@ -64,7 +64,6 @@ class JoinCTF(commands.Cog):
 
 		result = metadata_obj.tables.keys()
 
-
 		if "ctf_teams" in list(result):
 			ctf_teams_flag = True
 
@@ -123,12 +122,21 @@ class JoinCTF(commands.Cog):
 
 			msg = await ctx.channel.send("which ctf do you want to join?", view=view)
 
+		
+		ins = ctf_teams.insert().values(
+			name=team,
+			leader=str(ctx.author.id),
+			members=member_ids,
+			ctf_id=res[0][0]
+		)
+
+		connection.execute(ins)
 
 		member = f"{teams[0].mention}"
 		for t in range(1, len(teams)):
 			member += ", " + teams[t].mention
 
-		await ctx.followup.send(f"team {team} joined with {member} to the ctf")
+		await ctx.followup.send(f"team {team} joined with {member} to the ctf {res[0][1]}")
 
 
 def setup(bot):
