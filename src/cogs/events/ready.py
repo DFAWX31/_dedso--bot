@@ -11,7 +11,6 @@ class ReadyEvent(commands.Cog):
 		ctf_table, ctf_teams = create()
 
 		if ctf_table != None and ctf_teams != None:
-			print(ctf_table, ctf_teams)
 			print("Succesfully connected to the database")
 
 def setup(bot):
