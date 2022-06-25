@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands, bridge
 import sqlalchemy
 
-from database.create import metadata_obj, connection, engine
+from database.create import connection, ctf_table, ctf_teams
 
 class SelectMenu(discord.ui.Select):
 	def __init__(self, data:list, options:list, table:sqlalchemy.Table, team_name:str, leader:str, members, disabled=False):
@@ -60,43 +60,11 @@ class JoinCTF(commands.Cog):
 		except asyncio.TimeoutError:
 			return await ctx.followup.send("timed out because you were too slow")
 
-		ctf_teams_flag = False
-
-		result = metadata_obj.tables.keys()
-
-		if "ctf_teams" in list(result):
-			ctf_teams_flag = True
-
-		ctf_teams = None
-
-		ctf_table = sqlalchemy.Table(
-			"ctf_table", metadata_obj, autoload_with=engine
-		)
-
 		if ctf_table == None:
 			return await ctx.respond("failed to get ctf table")
 
-
-		if not ctf_teams_flag:
-			ctf_teams = sqlalchemy.Table(
-				"ctf_teams",
-				metadata_obj,
-				sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-				sqlalchemy.Column("name", sqlalchemy.String, nullable=False),
-				sqlalchemy.Column("leader", sqlalchemy.String, nullable=False),
-				sqlalchemy.Column("members", sqlalchemy.types.ARRAY(sqlalchemy.String), nullable = True),
-				sqlalchemy.Column("points", sqlalchemy.Integer, nullable=True),
-				sqlalchemy.Column("ctf_id", None, sqlalchemy.ForeignKey("ctf_table.id"))
-			)
-			metadata_obj.create_all()
-		else:
-			ctf_teams = sqlalchemy.Table(
-				"ctf_teams", metadata_obj, autoload_with=engine
-			)
-
 		if ctf_teams == None:
 			return await ctx.respond("failed to initialize database")
-		
 		
 
 		res = connection.execute(
@@ -120,7 +88,7 @@ class JoinCTF(commands.Cog):
 			view = discord.ui.View()
 			view.add_item(SelectMenu(res, options, ctf_teams, team, str(ctx.author.id), member_ids))
 
-			msg = await ctx.channel.send("which ctf do you want to join?", view=view)
+			return await ctx.channel.send("which ctf do you want to join?", view=view)
 
 		
 		ins = ctf_teams.insert().values(

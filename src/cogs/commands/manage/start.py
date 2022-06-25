@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands, bridge
 import sqlalchemy
 
-from database.create import metadata_obj, connection, engine
+from database.create import connection, ctf_table
 
 class StartCTF(commands.Cog):
 	def __init__(self, bot):
@@ -10,27 +10,9 @@ class StartCTF(commands.Cog):
 
 	@bridge.bridge_command(description="start a ctf")
 	async def start(self, ctx, ctf_name: discord.Option(str), date:discord.Option(str)):
-		ctf_table_flag = False
 
-		result = metadata_obj.tables.keys()
-
-		if "ctf_table" in  list(result):
-			ctf_table_flag = True
-
-		if not ctf_table_flag:
-			ctf_table = sqlalchemy.Table(
-				"ctf_table",
-				metadata_obj,
-				sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-				sqlalchemy.Column("name", sqlalchemy.String),
-				sqlalchemy.Column("date", sqlalchemy.String, nullable=False),
-				sqlalchemy.Column("active", sqlalchemy.Boolean, nullable=False)
-			)
-			metadata_obj.create_all(engine, checkfirst=True)
-		else:
-			ctf_table = sqlalchemy.Table(
-				"ctf_table", metadata_obj, autoload_with=engine
-			)
+		if ctf_table == None:
+			return ctx.respond("table not found in database")
 
 		s = sqlalchemy.select(ctf_table).where(ctf_table.c.name == ctf_name)
 
