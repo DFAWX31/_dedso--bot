@@ -2,6 +2,7 @@ import asyncio
 
 from dotenv import load_dotenv
 
+
 async def main() -> None:
     import bot
     import settings

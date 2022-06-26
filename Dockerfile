@@ -5,12 +5,12 @@ RUN apt-get -y update && apt-get -y install git
 
 RUN pip install poetry==$POETRY_VERSION
 
+WORKDIR /app
+
 COPY pyproject.toml  .
 COPY poetry.lock .
 
 RUN poetry install --no-dev
-
-WORKDIR /app
 
 COPY . .
 

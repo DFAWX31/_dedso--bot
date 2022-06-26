@@ -25,9 +25,13 @@ async def _load_cogs(bot):
     paths = get_files(cogs_dir)
 
     for path in paths:
-        trim = str(path).replace(str(cogs_dir), "")
-        trim = trim.replace(".py", "")
-        main_path = "cogs" + trim.replace("\\", ".")
+        # trim = str(path).replace(str(cogs_dir), "")
+        # trim = trim.replace(".py", "")
+        # main_path = "cogs" + trim.replace("\\", ".")
+        # print(main_path)
+        main_path = (
+            str(path).replace("/", ".").replace(".app.src.", "").replace(".py", "")
+        )  # comment this and uncomment above 4 lines to run on windows
         bot.load_extension(main_path)
 
 
